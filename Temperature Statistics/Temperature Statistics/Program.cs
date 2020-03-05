@@ -98,7 +98,6 @@ namespace Temperature_Statistics
         {
             int n;
             double min, max;
-
             Console.Write("Anzahl der Messwerte: ");
             int.TryParse(Console.ReadLine(), out n);
             Console.Write("Untere Grenze der Messungen: ");
