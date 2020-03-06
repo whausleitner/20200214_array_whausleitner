@@ -9,107 +9,122 @@ namespace Temperature_Statistics
     class Program
     {
         /// <summary>
-        /// Gibt Werte für ein Array aus.
+        /// Erstellt ein array vom Messwerten mittels Zufallsgenerator
         /// </summary>
-        /// <param name="n"></param>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
-        /// <returns></returns>
-        static double[] GetMeasurements(int n, double min, double max)
+        /// <param name="n">Anzahl der Messwerte</param>
+        /// <param name="minValue">Minimalwert</param>
+        /// <param name="maxValue">Maximalwert</param>
+        /// <returns>
+        /// array Measurements mit Messwerten
+        /// </returns>
+        static double[] GetMeasurements(int n, double minValue, double maxValue)
         {
-            Random rdm = new Random();
+            Random generator = new Random();
             double[] Measurements = new double[n];
             for (int i = 0; i < n; i++)
             {
-                double rp = rdm.NextDouble() * (max - min) + min;
-                Measurements[i] = rp;
+                Measurements[i] = generator.NextDouble() * (maxValue - minValue) + minValue;
+                // generator.NextDouble() ... erzeugt double-Zufallszahl zwischen 0 und 1
             }
             return Measurements;
         }
+
         /// <summary>
         /// Bestimmt den kleinsten Wert des Arrays
         /// </summary>
-        /// <param name="array"></param>
-        /// <returns></returns>
+        /// <param name="array">Array mit Messwerten</param>
+        /// <returns>
+        /// Minimum des Arrays
+        /// </returns>
         static double GetMinimum(double[] array)
         {
-            double min = array[0];
+            double min = double.MaxValue;
             for (int i = 0; i < array.Length; i++)
             {
-                if (min > array[i])
-                {
-                    min = array[i];
-                }
+                if (array[i] < min) min = array[i];
             }
+            if (array.Length == 0) min = double.NaN; // ist das array leer (n=0), dann ist min = NaN
             return min;
         }
+
         /// <summary>
         /// Bestimmt den größten Wert des Arrays
         /// </summary>
-        /// <param name="array"></param>
-        /// <returns></returns>
+        /// <param name="array">Array mit Messwerten</param>
+        /// <returns>
+        /// Maximum des Arrays
+        /// </returns>
         static double GetMaximum(double[] array)
         {
-            double max = array[0];
+            double max = double.MinValue;
             for (int i = 0; i < array.Length; i++)
             {
-                if (max < array[i])
-                {
-                    max = array[i];
-                }
+                if (array[i] > max) max = array[i];
             }
+            if (array.Length == 0) max = double.NaN; // ist das array leer (n=0), dann ist max = NaN
             return max;
         }
+
         /// <summary>
-        /// Errechnet den Mittelwert eines Arrays
+        /// Bestimmt den Mittelwert eines Arrays
         /// </summary>
-        /// <param name="array"></param>
-        /// <returns></returns>
+        /// <param name="array">Array mit Messwerten</param>
+        /// <returns>
+        /// Arithmetisches Mittel der Werte in array
+        /// </returns>
         static double GetMean(double[] array)
         {
-            double mean = array[0];
-            int n = 0;
+            double meanValue = 0;            
             for (int i = 0; i < array.Length; i++)
             {
-                n++;
-                mean = array[0 + i];
+                meanValue += array[i];
             }
-            return mean / n;
-        }
-        /// <summary>
-        /// Errechnet die Standardabweichung der Messwerte
-        /// </summary>
-        /// <param name="array"></param>
-        /// <returns></returns>
-        static double GetStandardDeviation(double[] array)
-        {
-            double mean = GetMean(array), varianz = 0;
-            int n = 0;
-            for (int i = 0; i < array.Length; i++)
-            {
-                n++;
-                varianz = varianz + Math.Pow(array[0 + i] - mean, 2);
-            }
-            varianz = varianz / n;
-            return Math.Sqrt(varianz);
+            return meanValue / array.Length;
         }
 
+        /// <summary>
+        /// Berechnet die Standardabweichung der Werte in array
+        /// </summary>
+        /// <param name="array">Array mit Messwerten</param>
+        /// <returns>
+        /// Standardabweichung der Werte in array
+        /// </returns>
+        static double GetStandardDeviation(double[] array)
+        {
+            double mean = GetMean(array);
+            double variance = 0, standardDeviation = 0;
+            // int n = 0;
+            for (int i = 0; i < array.Length; i++)
+            {
+               variance += Math.Pow(array[i] - mean, 2);
+                // Summe der quadratischen Abweichungen vom Mittwelwert
+            }
+            variance /= array.Length;
+            // Varianz ist die mittlere quadratischen Abweichung vom Mittwelwert
+            standardDeviation = Math.Sqrt(variance); // std.deviation ist Wurzel aus Varianz
+            return standardDeviation;
+        }
+
+        /// <summary>
+        /// Hauptprogramm
+        /// </summary>
+        /// <param name="args"></param>
         static void Main(string[] args)
         {
             int n;
             double min, max;
 
-            Console.Write("Anzahl der Messwerte: ");
+            Console.Write("Anzahl der Temperaturwerte: ");
             int.TryParse(Console.ReadLine(), out n);
-            Console.Write("Untere Grenze der Messungen: ");
+            Console.Write("Minimalwert: ");
             double.TryParse(Console.ReadLine(), out min);
-            Console.Write("Obere Grenze der Messungen: ");
+            Console.Write("Maximalwert: ");
             double.TryParse(Console.ReadLine(), out max);
 
-            Console.WriteLine("Der kleinste Messwert ist: " + GetMinimum(GetMeasurements(n, min, max)));
-            Console.WriteLine("Der größte Messwert ist: " + GetMaximum(GetMeasurements(n, min, max)));
-            Console.WriteLine("Der Mittelwert der Messwerte ist: " + GetMean(GetMeasurements(n, min, max)));
-            Console.WriteLine("Die Standardabweichung der Messwerte ist: " + GetStandardDeviation(GetMeasurements(n, min, max)));
+            Console.WriteLine("Kleinster Messwert: " + GetMinimum(GetMeasurements(n, min, max)));
+            Console.WriteLine("Größter Messwert: " + GetMaximum(GetMeasurements(n, min, max)));
+            Console.WriteLine("Arithmetisches Mittel der Messwerte: " + GetMean(GetMeasurements(n, min, max)));
+            Console.WriteLine("Standardabweichung der Messwerte: " + GetStandardDeviation(GetMeasurements(n, min, max)));
         }
     }
 }
